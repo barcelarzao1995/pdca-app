@@ -16,6 +16,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('🚀 API PDCA Conlog está rodando!');
 });
+app.get('/api/health', (req, res) => res.send('ok'));
 
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
