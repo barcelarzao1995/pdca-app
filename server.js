@@ -16,7 +16,19 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('🚀 API PDCA Conlog está rodando!');
 });
+
 app.get('/api/health', (req, res) => res.send('ok'));
+
+// ✅ Rota de verificação da conexão com o MongoDB
+app.get('/api/db-check', async (req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.send('✅ MongoDB está online e respondendo');
+  } catch (err) {
+    console.error('❌ Erro ao pingar o MongoDB:', err);
+    res.status(500).send('❌ MongoDB inacessível');
+  }
+});
 
 // Rotas da aplicação
 app.use('/api/auth', authRoutes);
