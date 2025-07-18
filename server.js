@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
   res.send('🚀 API PDCA Conlog está rodando!');
 });
 
+app.get('/health', (req, res) => res.send('ok'));
 app.get('/api/health', (req, res) => res.send('ok'));
 
 // ✅ Rota de verificação da conexão com o MongoDB
