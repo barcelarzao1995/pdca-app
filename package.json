@@ -22,11 +22,19 @@
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
-    "express": "^4.18.2",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.3"
+    "mongoose": "^8.16.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/barcelarzao1995/pdca-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/barcelarzao1995/pdca-app/issues"
+  },
+  "homepage": "https://github.com/barcelarzao1995/pdca-app#readme"
 }

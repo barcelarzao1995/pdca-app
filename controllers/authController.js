@@ -1,67 +1,60 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+// controllers/authController.js
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import User from '../models/Usuario.js';
 
-const gerarToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
-  });
-};
-
-exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
-
+export const registrarUsuario = async (req, res) => {
   try {
-    const existeUsuario = await User.findOne({ email });
-    if (existeUsuario) {
-      return res.status(400).json({ message: 'Usuário já existe' });
+    const { matricula, senha, nome, tipo } = req.body;
+
+    const usuarioExistente = await User.findOne({ matricula });
+    if (usuarioExistente) {
+      return res.status(400).json({ error: 'Matrícula já cadastrada.' });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
-    const novoUsuario = await User.create({ name, email, password: hashed });
+    const senhaCriptografada = await bcrypt.hash(senha, 10);
 
-    const token = gerarToken(novoUsuario._id);
-
-    // Retorna o token e os dados do usuário (sem a senha)
-    res.status(201).json({
-      user: {
-        _id: novoUsuario._id,
-        name: novoUsuario.name,
-        email: novoUsuario.email,
-      },
-      token,
+    const novoUsuario = new User({
+      matricula,
+      senha: senhaCriptografada,
+      nome,
+      tipo: tipo || 'comum',
     });
-  } catch (err) {
-    res.status(500).json({ message: 'Erro ao registrar' });
+
+    await novoUsuario.save();
+    res.status(201).json({ message: 'Usuário cadastrado com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao registrar usuário.' });
   }
 };
 
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
+export const login = async (req, res) => {
   try {
-    const usuario = await User.findOne({ email });
+    const { matricula, senha } = req.body;
+    const usuario = await User.findOne({ matricula });
+
     if (!usuario) {
-      return res.status(401).json({ message: 'Credenciais inválidas' });
+      return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    const senhaValida = await bcrypt.compare(password, usuario.password);
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
     if (!senhaValida) {
-      return res.status(401).json({ message: 'Credenciais inválidas' });
+      return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    const token = gerarToken(usuario._id);
+    const token = jwt.sign(
+      { id: usuario._id, tipo: usuario.tipo },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
-    // Retorna o token e os dados do usuário (sem a senha)
     res.json({
-      user: {
-        _id: usuario._id,
-        name: usuario.name,
-        email: usuario.email,
-      },
       token,
+      tipo: usuario.tipo,
+      nome: usuario.nome,
+      matricula: usuario.matricula,
     });
-  } catch (err) {
-    res.status(500).json({ message: 'Erro ao fazer login' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro no login.' });
   }
 };
