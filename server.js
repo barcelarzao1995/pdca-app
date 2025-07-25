@@ -32,6 +32,11 @@ app.get('/', (req, res) => {
   res.send('API do Controle de Viagens está rodando.');
 });
 
+// Rota de health check
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API rodando normalmente.' });
+});
+
 // Inicialização do servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
