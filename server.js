@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import viagemRoutes from './routes/viagemRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import usuarioRoutes from './routes/usuarioRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Rotas
 app.use('/api/viagens', viagemRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 // Rota padrão
 app.get('/', (req, res) => {
