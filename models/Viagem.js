@@ -1,13 +1,31 @@
-// models/Viagem.js
 import mongoose from 'mongoose';
 
+const pontoRotaSchema = new mongoose.Schema({
+  latitude: Number,
+  longitude: Number,
+  timestamp: { type: Date, default: Date.now }
+}, { _id: false });
+
 const viagemSchema = new mongoose.Schema({
-  motorista: {
+  matricula: {
     type: String,
     required: true,
   },
-  placa: {
+  nomeFuncionario: {
     type: String,
+    required: true,
+  },
+  veiculo: {
+    type: String,
+    required: true,
+  },
+  area: {
+    type: String,
+    enum: ['ADM', 'INDÚSTRIA', 'AGRÍCOLA'],
+    required: true,
+  },
+  numeroPassageiros: {
+    type: Number,
     required: true,
   },
   localSaida: {
@@ -22,16 +40,31 @@ const viagemSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  dataRetorno: {
-    type: Date,
-    required: false,
+  horarioSaida: {
+    type: String,
+    required: true,
+  },
+  kmInicial: {
+    type: Number,
+    required: true,
+  },
+  horarioChegada: {
+    type: String,
+  },
+  kmFinal: {
+    type: Number,
+  },
+  status: {
+    type: String,
+    enum: ['em_andamento', 'finalizada'],
+    default: 'em_andamento',
   },
   observacoes: {
     type: String,
     default: '',
   },
   rota: {
-    type: [Object], // Ex: [{ latitude: -23.5, longitude: -46.6, timestamp: Date }]
+    type: [pontoRotaSchema],
     default: [],
   },
   criadoPor: {

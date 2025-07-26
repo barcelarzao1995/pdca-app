@@ -1,4 +1,3 @@
-// routes/viagemRoutes.js
 import express from 'express';
 import {
   criarViagem,
@@ -6,16 +5,28 @@ import {
   obterViagemPorId,
   atualizarStatusViagem,
   adicionarPontoRota,
+  finalizarViagem
 } from '../controllers/viagemController.js';
-import { autenticarToken } from '../controllers/auth.js';
+import { autenticarToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Todas as rotas abaixo exigem token JWT
+// Criar viagem (Início da Viagem)
 router.post('/', autenticarToken, criarViagem);
-router.get('/', autenticarToken, listarViagens);
-router.get('/:id', autenticarToken, obterViagemPorId);
+
+// Finalizar viagem (Parte 2)
+router.patch('/:id/finalizar', autenticarToken, finalizarViagem);
+
+// Atualizar status (opcional)
 router.patch('/:id/status', autenticarToken, atualizarStatusViagem);
-router.post('/:id/rota', autenticarToken, adicionarPontoRota);
+
+// Adicionar ponto de rota via GPS
+router.patch('/:id/rota', autenticarToken, adicionarPontoRota);
+
+// Listar todas as viagens
+router.get('/', autenticarToken, listarViagens);
+
+// Obter viagem por ID
+router.get('/:id', autenticarToken, obterViagemPorId);
 
 export default router;

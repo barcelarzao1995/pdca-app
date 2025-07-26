@@ -1,17 +1,34 @@
 // controllers/viagemController.js
 import Viagem from '../models/Viagem.js';
 
+// Criar nova viagem (Parte 1 - Início da Viagem)
 export const criarViagem = async (req, res) => {
   try {
-    const { placa, motorista, data, origem, destino, localidade } = req.body;
+    const {
+      motorista,
+      placa,
+      localSaida,
+      localDestino,
+      dataSaida,
+      horarioSaida,
+      kmInicial,
+      veiculo,
+      area,
+      numPassageiros
+    } = req.body;
 
     const novaViagem = new Viagem({
-      placa,
       motorista,
-      data,
-      origem,
-      destino,
-      localidade,
+      placa,
+      localSaida,
+      localDestino,
+      dataSaida,
+      horarioSaida,
+      kmInicial,
+      veiculo,
+      area,
+      numPassageiros,
+      status: 'em andamento',
       criadoPor: req.userId,
     });
 
@@ -23,27 +40,29 @@ export const criarViagem = async (req, res) => {
   }
 };
 
-export const listarViagens = async (req, res) => {
+// Finalizar viagem (Parte 2)
+export const finalizarViagem = async (req, res) => {
   try {
-    const viagens = await Viagem.find().populate('criadoPor', 'matricula');
-    res.json(viagens);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar viagens.' });
-  }
-};
+    const { horarioRetorno, kmFinal } = req.body;
 
-export const obterViagemPorId = async (req, res) => {
-  try {
     const viagem = await Viagem.findById(req.params.id);
     if (!viagem) {
       return res.status(404).json({ error: 'Viagem não encontrada.' });
     }
+
+    viagem.horarioRetorno = horarioRetorno;
+    viagem.kmFinal = kmFinal;
+    viagem.status = 'finalizada';
+
+    await viagem.save();
     res.json(viagem);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar viagem.' });
+    console.error('Erro ao finalizar viagem:', error);
+    res.status(500).json({ error: 'Erro ao finalizar viagem.' });
   }
 };
 
+// Atualizar status (ex: "em andamento", "finalizada")
 export const atualizarStatusViagem = async (req, res) => {
   try {
     const { status } = req.body;
@@ -54,10 +73,11 @@ export const atualizarStatusViagem = async (req, res) => {
     );
     res.json(viagemAtualizada);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar viagem.' });
+    res.status(500).json({ error: 'Erro ao atualizar status da viagem.' });
   }
 };
 
+// Adicionar ponto de rota via GPS
 export const adicionarPontoRota = async (req, res) => {
   try {
     const { latitude, longitude } = req.body;
@@ -74,5 +94,28 @@ export const adicionarPontoRota = async (req, res) => {
     res.json(viagem);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao adicionar ponto de rota.' });
+  }
+};
+
+// Listar todas as viagens
+export const listarViagens = async (req, res) => {
+  try {
+    const viagens = await Viagem.find().populate('criadoPor', 'matricula');
+    res.json(viagens);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar viagens.' });
+  }
+};
+
+// Obter viagem por ID
+export const obterViagemPorId = async (req, res) => {
+  try {
+    const viagem = await Viagem.findById(req.params.id);
+    if (!viagem) {
+      return res.status(404).json({ error: 'Viagem não encontrada.' });
+    }
+    res.json(viagem);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar viagem.' });
   }
 };
