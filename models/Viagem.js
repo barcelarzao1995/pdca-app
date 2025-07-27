@@ -16,8 +16,9 @@ const viagemSchema = new mongoose.Schema({
     required: true,
   },
   veiculo: {
-    type: String,
-    required: true,
+  type: String,
+  required: true,
+  match: /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/, // Aceita placas antigas e Mercosul
   },
   area: {
     type: String,
