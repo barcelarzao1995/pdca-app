@@ -70,24 +70,32 @@ export const criarViagem = async (req, res) => {
 // Finalizar viagem (Parte 2)
 export const finalizarViagem = async (req, res) => {
   try {
-    const { horarioChegada, kmFinal } = req.body;
+    console.log('Finalizar Viagem - req.body:', req.body);
+    console.log('Viagem ID:', req.params.id);
+
+    const { dataFinal, horaFinal, kmFinal, observacoes } = req.body;
 
     const viagem = await Viagem.findById(req.params.id);
     if (!viagem) {
+      console.log('Viagem não encontrada');
       return res.status(404).json({ error: 'Viagem não encontrada.' });
     }
 
-    viagem.horarioChegada = horarioChegada;
+    viagem.dataFinal = dataFinal;
+    viagem.horaFinal = horaFinal;
     viagem.kmFinal = kmFinal;
+    viagem.observacoes = observacoes;
     viagem.status = 'finalizada';
 
     await viagem.save();
-    res.json(viagem);
+
+    res.json({ mensagem: 'Viagem finalizada com sucesso.', viagem });
   } catch (error) {
-    console.error('❌ Erro ao finalizar viagem:', error);
+    console.error('Erro ao finalizar viagem:', error);
     res.status(500).json({ error: 'Erro ao finalizar viagem.' });
   }
 };
+
 
 // Atualizar status (ex: "em_andamento", "finalizada")
 export const atualizarStatusViagem = async (req, res) => {
